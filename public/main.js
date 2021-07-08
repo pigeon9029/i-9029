@@ -24,15 +24,31 @@ nameForm.addEventListener('submit', function(event){
 
 
 form.addEventListener('submit', function(event){
-    
   if(input.value!==''){
-    socketio.emit('message', input.value);
+    const msg = {msg: input.value, name: username};
+    socketio.emit('message', msg);
     input.value='';
   }
   event.preventDefault();
 })
+
 socketio.on('message',function(msg){
-  const li = document.createElement("li");
-  li.append(msg);
-  chats.append(li);
+  displayMessage(msg);
 });
+
+// 参加時に過去のメッセージを受け取る
+socketio.on('signin',function(msgs){
+  for(let i=0;i<msgs.length;i++){
+    const msg = msgs[i];
+    displayMessage(msg);
+  }
+});
+
+function displayMessage(msg){
+  const dt = document.createElement("dt");
+  const dd = document.createElement("dd");
+  dt.append(msg.name);
+  chats.append(dt);
+  dd.append(msg.msg);
+  chats.append(dd);
+}
